@@ -4,7 +4,9 @@ CFLAGS = -Wall -Wextra -Werror
 
 NAME = server
 
-SRC = main.c \
+SRC = srcs/main.c \
+			srcs/server.c \
+			srcs/error.c
 
 OBJS = $(SRC:.c=.o)
 
