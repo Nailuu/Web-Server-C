@@ -6,7 +6,8 @@ NAME = server
 
 SRC = srcs/main.c \
 			srcs/server.c \
-			srcs/error.c
+			srcs/error.c \
+			srcs/routing.c \
 
 OBJS = $(SRC:.c=.o)
 

@@ -13,10 +13,14 @@
 
 int main(void)
 {
-  Server *server = init_server(8080, 5);	
+  Server *server = NULL;
+  int client_socket;
+
+  server = init_server(8080, 5);	
+  if (server == NULL)
+    return (0);
 
 	char buffer[256] = {0};
-	int client_socket_fd, requested_fd, bytes_read;
 	char path[256] = {0};
 	char header[2048];
 	char header404[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: 13\r\n\r\n404 Not Found";
@@ -25,23 +29,14 @@ int main(void)
 	{
 		// Accept incoming connection
 		printf("Waiting for incoming connection...\n");
-		client_socket_fd = accept(server->socket, 0, 0);	
+		client_socket = accept(server->socket, 0, 0);	
+    if (handle_connection(client_socket) == 0)
+    {
+      fprintf(stderr, "Error while handling connection");
+      close_server(server);
+      exit(EXIT_FAILURE);
+    }
 		printf("\n----------------------------\n");
-		if (client_socket_fd < 0)
-		{
-			perror("[ERROR] Accept socket");
-			exit(EXIT_FAILURE);
-		}
-
-		// Read client socket
-		read(client_socket_fd, buffer, sizeof(buffer) - 1);
-
-		// HTTP Request type and requested file 
-		strcpy(path, strchr(buffer, ' ') + 2);
-		*strchr(buffer, ' ') = '\0';
-		printf("REQUEST TYPE: '%s'\n", buffer);
-		*strchr(path, ' ') = '\0';
-		printf("REQUESTED PATH: '%s'\n\n", path);
 
 		// Send default data to client
 		if (strlen(path) == 0)
@@ -60,6 +55,7 @@ int main(void)
 			{
 				if (write(client_socket_fd, file, bytes_read) < 0)
 				{
+          close_server(server);
 					perror("[ERROR] Write to client socket");
 					exit(EXIT_FAILURE);
 				}
@@ -68,6 +64,7 @@ int main(void)
 			}
 			if (bytes_read < 0)
 			{
+        close_server(server);
 				perror("[ERROR] Reading requested file");
 				exit(EXIT_FAILURE);
 			}
