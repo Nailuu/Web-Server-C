@@ -44,9 +44,12 @@ void close_server(Server *server)
 
 int handle_connection(int client_socket, Route *route)
 {
-  char buffer[8192] = {0};
-  char *request_info, *content, *body, *method, *requested_page;
+  char buffer[4096] = {0};
+  char *request_info;
+  char *content;
+  char *requested_page;
   Route *file_route;
+  int method;
 
   if (client_socket < 0)
     return (0);
@@ -54,7 +57,7 @@ int handle_connection(int client_socket, Route *route)
   // Read http request from client
   if (read(client_socket, buffer, sizeof(buffer)) == 4096)
   {
-    http_too_big(client_socket, 1);
+    http_too_big(client_socket);
     return (1);
   }
 
@@ -64,50 +67,45 @@ int handle_connection(int client_socket, Route *route)
   *content = '\0';
   content++;
 
-  // Extract body from header
-  body = get_body(content);
-
   // Extract requested file 
   requested_page = get_http_request_url(request_info);
   if (requested_page == NULL)
     return (0);
 
-  printf("-----------------------------\n");
-
   // Extract HTTP Method
   method = get_http_method(request_info);
-	printf("METHOD: '%s'\n", method);
-  printf("URL: '%s'\n", requested_page);
-
-  // if http method is something else then get or post return invalid
-  if (strcmp(method, "GET") != 0 && strcmp(method, "POST") != 0)
+  if (method == 1)
+	  printf("METHOD: 'GET'\n");
+  else if (method == 2)
+    printf("METHOD: 'POST'\n");
+  else 
   {
-    http_invalid_method(client_socket, 1);
+    http_invalid_method(client_socket);
     return (1);
   }
+
+	printf("URL: '%s'\n", requested_page);
 
   // Get file location in route list
   file_route = search_route(route, requested_page);
   // Return 404 if not route found
   if (file_route == NULL)
   {
-    http_not_found(client_socket, 1);
+    http_not_found(client_socket);
     return (1);
   }
   // Call function for GET or POST Method
   else
   {
-    printf("PATH TO FILE: '%s'\n", file_route->value);
+    printf("PATH TO FILE: %s\n\n", file_route->value);
 
     // GET - Read then write to client socket the content of the file
-    if (strcmp(method, "GET") == 0)
-      send_file(client_socket, file_route);
+    if (method == 1)
+      send_file(client_socket, file_route->value) == 0)
 
     // POST - Truncate file content to request header content
-    else if (strcmp(method, "POST") == 0)
-      post_file(client_socket, file_route, body);
-
-    printf("-----------------------------\n\n");
+    else if (method == 2)
+      post_file(client_socket, file_route->value) == 0)
   }
 
   return (1);

@@ -8,6 +8,8 @@ SRC = srcs/main.c \
 			srcs/server.c \
 			srcs/error.c \
 			srcs/routing.c \
+			srcs/http_header.c \
+			srcs/file.c
 
 OBJS = $(SRC:.c=.o)
 

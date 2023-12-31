@@ -8,12 +8,13 @@ typedef struct Route
 {
   char *key;
   char *value;
+  int is_editable;
 
   struct Route *rigth, *left;
 } Route;
 
-Route *initRoute(char *key, char *value);
-Route *addRoute(Route *root, char *key, char *value);
-Route *searchRoute(Route *root, char *key);
+Route *add_route(Route *root, char *key, char *value, int is_editable);
+Route *search_route(Route *root, char *key);
+void clear_route(Route *root);
 
 #endif

@@ -1,6 +1,6 @@
 #include "routing.h"
 
-Route *initRoute(char *key, char *value)
+Route *init_route(char *key, char *value, int is_editable)
 {
   Route *root = (Route*)malloc(sizeof(Route));
   if (root == NULL)
@@ -8,26 +8,27 @@ Route *initRoute(char *key, char *value)
 
   root->key = key;
   root->value = value;
-  root->right = NULL;
+  root->is_editable = is_editable;
+  root->rigth = NULL;
   root->left = NULL;
 
   return (root);
 }
 
-Route *addRoute(Route *root, char *key, char *value)
+Route *add_route(Route *root, char *key, char *value, int is_editable)
 {
   if (root == NULL)
-    return (initRoute(key, value));
+    return (init_route(key, value, is_editable));
 
   if (strcmp(key, root->key) > 0)
-    root->right = addRoute(route->right, key, value);
+    root->rigth = add_route(root->rigth, key, value, is_editable);
   else 
-    root->left = addRoute(route->left, key, value);
+    root->left = add_route(root->left, key, value, is_editable);
 
   return (root);
 }
 
-Route *searchRoute(Route *root, char *key)
+Route *search_route(Route *root, char *key)
 {
   if (root == NULL)
     return (NULL);
@@ -36,8 +37,13 @@ Route *searchRoute(Route *root, char *key)
     return (root);
 
   else if (strcmp(key, root->key) > 0)
-    return (searchRoute(root->right, key));
+    return (search_route(root->rigth, key));
 
   else
-    return (searchRoute(root->left, key));
+    return (search_route(root->left, key));
+}
+
+void clear_route(Route *root)
+{
+  free(root);
 }
