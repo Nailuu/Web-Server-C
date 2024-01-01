@@ -17,9 +17,11 @@ typedef struct Server
 #include "error.h"
 #include "http_header.h"
 #include "routing.h"
+#include "threads.h"
+#include "file.h"
 
 Server *init_server(int port, int backlog);
 void close_server(Server *server);
-int handle_connection(int client_socket, Route *route);
+void handle_connection(ThreadArgs *t_args);
 
 #endif

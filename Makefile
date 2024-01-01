@@ -9,7 +9,8 @@ SRC = srcs/main.c \
 			srcs/error.c \
 			srcs/routing.c \
 			srcs/http_header.c \
-			srcs/file.c
+			srcs/file.c \
+			srcs/threads.c
 
 OBJS = $(SRC:.c=.o)
 
@@ -20,7 +21,7 @@ all: $(NAME)
 $(NAME): $(OBJS) compile
 
 $(OBJS): %.o: %.c 
-	$(CC) $(CFLAGS) -I $(HEADER) -c $< -o $@
+	$(CC) -g $(CFLAGS) -I $(HEADER) -c $< -o $@
 
 compile:
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)

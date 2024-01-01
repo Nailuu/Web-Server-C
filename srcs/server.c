@@ -1,8 +1,4 @@
 #include "server.h"
-#include "error.h"
-#include "http_header.h"
-#include "routing.h"
-#include "file.h"
 
 Server *init_server(int port, int backlog)
 {
@@ -42,24 +38,29 @@ void close_server(Server *server)
   free(server);
 }
 
-int handle_connection(int client_socket, Route *route)
+void handle_connection(ThreadArgs *t_args)
 {
   char buffer[8192] = {0};
   char *request_info, *content, *body, *method, *requested_page;
-  Route *file_route;
-  int bytes_read;
+  Route *route, *file_route;
+  int client_socket, bytes_read;
+
+  // Recovering args from thread
+  client_socket = t_args->client_socket;
+  route = t_args->route;
+  free(t_args);
 
   if (client_socket < 0)
-    return (0);
+    return ;
 
   // Read http request from client
   if ((bytes_read = read(client_socket, buffer, sizeof(buffer))) == 8192)
   {
     http_too_big(client_socket, 1);
-    return (1);
+    return ;
   }
   if (bytes_read < 0)
-    return (0);
+    return ;
 
   // Extract first line of request header and other into content 
   request_info = buffer;
@@ -73,7 +74,7 @@ int handle_connection(int client_socket, Route *route)
   // Extract requested file 
   requested_page = get_http_request_url(request_info);
   if (requested_page == NULL)
-    return (0);
+    return ;
 
   printf("-----------------------------\n");
 
@@ -86,7 +87,7 @@ int handle_connection(int client_socket, Route *route)
   if (strcmp(method, "GET") != 0 && strcmp(method, "POST") != 0)
   {
     http_invalid_method(client_socket, 1);
-    return (1);
+    return ;
   }
 
   // Get file location in route list
@@ -95,7 +96,7 @@ int handle_connection(int client_socket, Route *route)
   if (file_route == NULL)
   {
     http_not_found(client_socket, 1);
-    return (1);
+    return ;
   }
   // Call function for GET or POST Method
   else
@@ -113,5 +114,5 @@ int handle_connection(int client_socket, Route *route)
     printf("-----------------------------\n\n");
   }
 
-  return (1);
+  return ;
 }
