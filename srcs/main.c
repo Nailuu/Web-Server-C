@@ -18,6 +18,13 @@ static void sig_handler(int)
 #define BACKLOG_SIZE 25
 #define THREAD_POOL_SIZE 25
 
+// Creating global mutex to lock thread and create safe queue
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+// Creating global conditional variable to avoid using to much cpu always looping and checking into the queue
+pthread_cond_t cond_var = PTHREAD_COND_INITIALIZER;
+
+
 int main(void)
 {
   // Handle SIGINT and close program properly on CTRL+C
@@ -38,11 +45,8 @@ int main(void)
   add_route(route, "/about", "files/about.html", 1);
   add_route(route, "/about/map", "files/map.txt", 0);
 
-  // Creating mutex to lock thread and create safe queue
-  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-  
   // Initialize thread pool with given size
-  pthread_t *pool = init_thread_pool(THREAD_POOL_SIZE, &mutex);
+  pthread_t *pool = init_thread_pool(THREAD_POOL_SIZE);
   if (pool == NULL)
     return (1);
 
@@ -57,8 +61,11 @@ int main(void)
     ThreadArgs *t_args = init_thread_args(route, client_socket);
     if (t_args == NULL)
       break;
+
+    // Lock thread to avoid multiple thread freeing the same queue node at the same time
     pthread_mutex_lock(&mutex);
     enqueue_thread(t_args);
+    pthread_cond_signal(&cond_var);
     pthread_mutex_unlock(&mutex);
   }
 

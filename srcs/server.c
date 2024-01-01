@@ -44,6 +44,8 @@ void handle_connection(ThreadArgs *t_args)
   char *request_info, *content, *body, *method, *requested_page;
   Route *route, *file_route;
   int client_socket, bytes_read;
+  
+  printf("New connection established\n");
 
   // Recovering args from thread
   client_socket = t_args->client_socket;
@@ -76,12 +78,12 @@ void handle_connection(ThreadArgs *t_args)
   if (requested_page == NULL)
     return ;
 
-  printf("-----------------------------\n");
+  //printf("-----------------------------\n");
 
   // Extract HTTP Method
   method = get_http_method(request_info);
-	printf("METHOD: '%s'\n", method);
-  printf("URL: '%s'\n", requested_page);
+	//printf("METHOD: '%s'\n", method);
+  //printf("URL: '%s'\n", requested_page);
 
   // if http method is something else then get or post return invalid
   if (strcmp(method, "GET") != 0 && strcmp(method, "POST") != 0)
@@ -101,7 +103,7 @@ void handle_connection(ThreadArgs *t_args)
   // Call function for GET or POST Method
   else
   {
-    printf("PATH TO FILE: '%s'\n", file_route->value);
+    //printf("PATH TO FILE: '%s'\n", file_route->value);
 
     // GET - Read then write to client socket the content of the file
     if (strcmp(method, "GET") == 0)
@@ -111,8 +113,9 @@ void handle_connection(ThreadArgs *t_args)
     else if (strcmp(method, "POST") == 0)
       post_file(client_socket, file_route, body);
 
-    printf("-----------------------------\n\n");
+    //printf("-----------------------------\n\n");
   }
 
+  printf("Closing connection\n");
   return ;
 }

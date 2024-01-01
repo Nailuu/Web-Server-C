@@ -20,7 +20,7 @@ typedef struct ThreadsQueue
 } ThreadsQueue;
 
 ThreadArgs *init_thread_args(Route *route, int client_socket);
-pthread_t *init_thread_pool(int size, pthread_mutex_t *mutex);
+pthread_t *init_thread_pool(int size);
 void enqueue_thread(ThreadArgs *t_args);
 ThreadArgs *dequeue_thread(void);
 

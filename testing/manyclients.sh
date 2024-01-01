@@ -1,7 +1,7 @@
 #!/bin/bash
 
-for i in {1..50}
+for i in {1..5000}
 do
-	ruby client.rb &
+  ruby client.rb &
 done
 wait
