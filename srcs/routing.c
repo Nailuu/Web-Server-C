@@ -45,5 +45,11 @@ Route *search_route(Route *root, char *key)
 
 void clear_route(Route *root)
 {
+  if (root == NULL)
+    return ;
+
+  clear_route(root->rigth);
+  clear_route(root->left);
+
   free(root);
 }

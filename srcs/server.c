@@ -47,16 +47,19 @@ int handle_connection(int client_socket, Route *route)
   char buffer[8192] = {0};
   char *request_info, *content, *body, *method, *requested_page;
   Route *file_route;
+  int bytes_read;
 
   if (client_socket < 0)
     return (0);
 
   // Read http request from client
-  if (read(client_socket, buffer, sizeof(buffer)) == 4096)
+  if ((bytes_read = read(client_socket, buffer, sizeof(buffer))) == 8192)
   {
     http_too_big(client_socket, 1);
     return (1);
   }
+  if (bytes_read < 0)
+    return (0);
 
   // Extract first line of request header and other into content 
   request_info = buffer;
