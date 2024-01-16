@@ -38,3 +38,7 @@ docker:
 	sudo docker build -t web_server:1.0 .
 	sudo docker compose up -d
 	sudo docker ps
+
+dclean:
+	sudo docker compose down
+	sudo docker image rm web_server:1.0
