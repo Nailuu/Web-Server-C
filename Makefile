@@ -33,3 +33,8 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+docker:
+	sudo docker build -t web_server:1.0 .
+	sudo docker compose up -d
+	sudo docker ps
